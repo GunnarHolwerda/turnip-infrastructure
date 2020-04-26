@@ -23,6 +23,7 @@ const rds = new aws.rds.Instance('turnip-db', {
     instanceClass: 'db.t3.micro',
     allocatedStorage: 20,
     publiclyAccessible: true,
+    skipFinalSnapshot: true,
     vpcSecurityGroupIds: [dbSecurityGroup.id]
 });
 
@@ -44,6 +45,8 @@ const user = new postgresql.Role('app-db-user', {
     login: true,
     password: appDbPassword,
     createDatabase: true,
+    createRole: true,
+    skipReassignOwned: true,
     name: appDatabaseUser
 }, {
     provider: postgresProvider,
