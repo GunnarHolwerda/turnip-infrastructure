@@ -1,0 +1,27 @@
+config:
+  aws:region: us-west-2
+  turnip-bot:bot-container: docker.pkg.github.com/gunnarholwerda/turnip-bot/discord-bot:latest
+  turnip-bot:dbLogging: "false"
+  turnip-bot:dbPort: "5432"
+  turnip-bot:dbSynchronize: "true"
+  turnip-bot:discordToken:
+    secure: AAABALiSA5/aCTDtsaVXlg6oZGvuX5+Aqt12kq0+SHb7oXaSLabXlPldTNXCt9U51Bu3XwlB078dXwS2FKZOmI9sHFrsfLW7P0NHKcTfGzJfcWf+hFnEF0COqw==
+  turnip-bot:dockerRegistryToken:
+    secure: AAABAH6IralUuoy1MM40khHTyEAjHfLwyljieH4s3KPfXqSPsdpvsDsAjk2C7XpP9D0ffk/3YWlFsNN7k3qIHv/JWvbwPqJx
+  turnip-bot:entitiesPath: dist/entity/**/*.js
+  turnip-bot:migrationsPath: dist/migration/**/*.js
+  turnip-bot:postgresDb: turnip_tracker
+  turnip-bot:postgresPassword:
+    secure: AAABAJ70oXnGktN0TC7BPICiEGbnxMnufbyIbQlbL5k6ru47NRxk9/mRazLVz3GLBbKebaUHcWiY
+  turnip-bot:postgresUser: app
+  turnip-bot:publicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC7z+DGsHDPBUOwNi4jDQfgph27a+bTwsfTHZr/wTXYtkIBtakK2Oz+2rcfEcw5fOFQ7wj4urqKq6ur6DerjJ61MoLg0hYBvJ8zUYQhU5U4J9R5Q1cYjKh1bFHOUXnUDoZEusZlpFOWlCl70GGoGefsPUyN+i6yBtfiBRZcqODYZVHWD7tHk3iA3JiwcQXae+FfTuABWRxmt5fRR+JYZEmaal+1GWlu7yFJYd4r2IO6tHqD3xvZyZUKXB7iOfMux49meLAgRK/336ObilWddlqoxn3Y2EhsScSmuwkRkxKSkyXlCcuet1yjWnMCAEq2t8VQa+LpD/w/A4XBzh7rusC6Z4RmivlXATSmbuj0iwtCfpAgsXis5cj3KL6nVYdfU7y6fScVElU6loPTg16WAA7AbIDBqSr2CxuKbbR/cHG3H0PJmHu/ob2Wl5FIQM7/v0U8wjLQlcp5w6/0s/qREyWmVrd25lccVLwSa69YuxyrLduTRkDdN6zAQI6do/MlUO4EJhz5rPzx2TbRyBqsWcpsGkgwaVvN1J9ufFURW8RaOSZ9XzLpNEaWZYOXvHYf7ujgz9BGuH8SU3w95fDOozvimMkVEuGFNOJYgBfkJId41pZyVQyvhVo/ycBfgnZvOyt2Xr9jQowy3vIR0SYNfF22ngUMPHP4d1UfWn8OzhacIQ==
+    gunnarholwerda@gmail.com
+  turnip-bot:rdsRootPassword:
+    secure: AAABAD8ywYesW5ySqLtZEDUFRhuAW8bL1u5GVsI7LBVMWb1jcApGeqaJ0NNrfw6zwQAnhDhMnALY
+  turnip-bot:rdsRootUser: root
+  turnip-bot:redis:
+    password:
+      secure: AAABAHupo+G9cOAO02EgSvDXh+BmkQEJkNKKhkuv/HOLzUtop6D3tlSG5u+aIawFTY2ps+cF9cCt
+  turnip-bot:redisPassword:
+    secure: AAABAMJ2+LN6TdG67UYUhNrhk9wGZj2F66i6FOxQSybbK2k4yKw2Os4GHNgcoYk/Q1ibFft+oGRf
+  turnip-bot:subscribersPath: dist/subscriber/**/*.js

@@ -1,0 +1,3 @@
+name: turnip-bot
+runtime: nodejs
+description: Infrastructure for the Discord Turnip Bot

@@ -1,0 +1,64 @@
+import * as aws from '@pulumi/aws';
+import * as pulumi from '@pulumi/pulumi';
+import * as postgresql from '@pulumi/postgresql';
+
+const config = new pulumi.Config();
+const rootUser = config.require('rdsRootUser');
+const rootPassword = config.requireSecret('rdsRootPassword');
+
+const dbSecurityGroup = new aws.ec2.SecurityGroup('db-security-group', {
+    ingress: [
+        { protocol: 'tcp', fromPort: 5432, toPort: 5432, cidrBlocks: ['0.0.0.0/0'] }
+    ],
+    egress: [
+        { protocol: 'tcp', fromPort: 5432, toPort: 5432, cidrBlocks: ['0.0.0.0/0'] }
+    ]
+})
+
+const rds = new aws.rds.Instance('turnip-db', {
+    engine: 'postgres',
+    username: rootUser,
+    password: rootPassword,
+    availabilityZone: 'us-west-2a',
+    instanceClass: 'db.t3.micro',
+    allocatedStorage: 20,
+    publiclyAccessible: true,
+    vpcSecurityGroupIds: [dbSecurityGroup.id]
+});
+
+const dbEndpoint = rds.endpoint.apply(e => e.substring(0, e.indexOf(':')));
+
+const postgresProvider = new postgresql.Provider('postgres', {
+    username: rds.username,
+    host: dbEndpoint,
+    expectedVersion: rds.engineVersion,
+    superuser: false,
+    password: rds.password as pulumi.Input<string>
+});
+
+const appDatabaseName = config.require('postgresDb');
+const appDatabaseUser = config.require('postgresUser');
+const appDbPassword = config.requireSecret('postgresPassword');
+
+const user = new postgresql.Role('app-db-user', {
+    login: true,
+    password: appDbPassword,
+    createDatabase: true,
+    name: appDatabaseUser
+}, {
+    provider: postgresProvider,
+    additionalSecretOutputs: ['password']
+});
+
+const db = new postgresql.Database('app-db', {
+    name: appDatabaseName,
+    owner: user.name
+}, {
+    provider: postgresProvider
+})
+
+const dbUser = user.name;
+const dbPassword = user.password as pulumi.Output<string>;
+const dbName = db.name;
+
+export { dbEndpoint, dbUser, dbPassword, dbName };
