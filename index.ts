@@ -2,30 +2,14 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import { dbEndpoint, dbName, dbUser, dbPassword } from './components/db';
+import { redisNodes, redisPort, cacheSecurityGroup } from './components/redis';
 
 const config = new pulumi.Config();
-const redisPort = 6379;
 
-const redisListener = new awsx.elasticloadbalancingv2.NetworkListener('turnip-redis-listener', { port: redisPort });
-const redisService = new awsx.ecs.FargateService('turnip-redis', {
-    desiredCount: 1,
-    taskDefinitionArgs: {
-        containers: {
-            turnipRedis: {
-                image: 'redis:alpine',
-                memory: 128,
-                portMappings: [redisListener]
-            }
-        }
-    }
-})
-
-const redisEndpoint = redisListener.endpoint;
-
-const environment = pulumi.all([redisEndpoint, dbEndpoint, dbUser, dbName])
-    .apply(([e, typeOrmEndpoint, typeOrmUser, typeOrmDb]) => [
-        { name: 'REDIS_HOST', value: e.hostname },
-        { name: 'REDIS_PORT', value: e.port.toString() },
+const environment = pulumi.all([redisNodes, redisPort, dbEndpoint, dbUser, dbName])
+    .apply(([redisNodes, rPort, typeOrmEndpoint, typeOrmUser, typeOrmDb]) => [
+        { name: 'REDIS_HOST', value: redisNodes.find(n => n.address)?.address || '' },
+        { name: 'REDIS_PORT', value: rPort.toString() },
         { name: 'TYPEORM_HOST', value: typeOrmEndpoint },
         { name: 'TYPEORM_CONNECTION', value: 'postgres' },
         { name: 'TYPEORM_USERNAME', value: typeOrmUser },
@@ -115,5 +99,25 @@ const botService = new awsx.ecs.FargateService('turnip-bot', {
         }
     }
 });
+
+botService.cluster.securityGroups.forEach(sg => {
+    new aws.ec2.SecurityGroupRule('service-cache-ingress', {
+        securityGroupId: cacheSecurityGroup.id,
+        fromPort: redisPort,
+        toPort: redisPort,
+        protocol: 'tcp',
+        type: 'ingress',
+        sourceSecurityGroupId: sg.id
+    });
+    new aws.ec2.SecurityGroupRule('service-cache-egress', {
+        securityGroupId: cacheSecurityGroup.id,
+        fromPort: redisPort,
+        toPort: redisPort,
+        protocol: 'tcp',
+        type: 'egress',
+        sourceSecurityGroupId: sg.id
+    });
+})
+
 
 export { dbEndpoint }
