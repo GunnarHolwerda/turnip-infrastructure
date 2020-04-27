@@ -3,7 +3,7 @@ config:
   turnip-bot:bot-container: docker.pkg.github.com/gunnarholwerda/turnip-bot/discord-bot:latest
   turnip-bot:dbLogging: "false"
   turnip-bot:dbPort: "5432"
-  turnip-bot:dbSynchronize: "true"
+  turnip-bot:dbSynchronize: "false"
   turnip-bot:discordToken:
     secure: AAABALiSA5/aCTDtsaVXlg6oZGvuX5+Aqt12kq0+SHb7oXaSLabXlPldTNXCt9U51Bu3XwlB078dXwS2FKZOmI9sHFrsfLW7P0NHKcTfGzJfcWf+hFnEF0COqw==
   turnip-bot:dockerRegistryToken:
