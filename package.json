@@ -10,7 +10,7 @@
         "@pulumi/aws": "^2.0.0",
         "@pulumi/awsx": "^0.18.10",
         "@pulumi/postgresql": "^2.0.0",
-        "@pulumi/pulumi": "^2.0.0",
+        "@pulumi/pulumi": "^2.2.1",
         "pcloudinit": "^0.1.0"
     }
 }
