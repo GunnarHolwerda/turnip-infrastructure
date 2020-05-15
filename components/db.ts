@@ -9,7 +9,7 @@ const rootPassword = config.requireSecret('rdsRootPassword');
 const dbPort = 5432;
 const devIpCidrBlock = config.getSecret('devIp') ? config.getSecret('devIp')?.apply(ip => `${ip}/32`) : undefined;
 
-const dbSecurityGroup = new aws.ec2.SecurityGroup('db-security-group')
+const dbSecurityGroup = new aws.ec2.SecurityGroup('db-security-group', { ingress: [], egress: [] });
 pulumi.all([devIpCidrBlock, dbSecurityGroup.id]).apply(([devIp, sgId]) => {
     if (!devIp) {
         return;
