@@ -1,18 +1,35 @@
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import * as postgresql from '@pulumi/postgresql';
+import { TcpPorts } from '@pulumi/awsx/ec2';
 
 const config = new pulumi.Config();
 const rootUser = config.require('rdsRootUser');
 const rootPassword = config.requireSecret('rdsRootPassword');
+const dbPort = 5432;
+const devIpCidrBlock = config.getSecret('devIp') ? config.getSecret('devIp')?.apply(ip => `${ip}/32`) : undefined;
 
-const dbSecurityGroup = new aws.ec2.SecurityGroup('db-security-group', {
-    ingress: [
-        { protocol: 'tcp', fromPort: 5432, toPort: 5432, cidrBlocks: ['0.0.0.0/0'] }
-    ],
-    egress: [
-        { protocol: 'tcp', fromPort: 5432, toPort: 5432, cidrBlocks: ['0.0.0.0/0'] }
-    ]
+const dbSecurityGroup = new aws.ec2.SecurityGroup('db-security-group')
+pulumi.all([devIpCidrBlock, dbSecurityGroup.id]).apply(([devIp, sgId]) => {
+    if (!devIp) {
+        return;
+    }
+    new aws.ec2.SecurityGroupRule('devip-ingress', {
+        securityGroupId: sgId,
+        protocol: 'tcp',
+        fromPort: dbPort,
+        toPort: dbPort,
+        cidrBlocks: [devIp],
+        type: 'ingress'
+    });
+    new aws.ec2.SecurityGroupRule('devip-egress', {
+        securityGroupId: sgId,
+        protocol: 'tcp',
+        fromPort: dbPort,
+        toPort: dbPort,
+        cidrBlocks: [devIp],
+        type: 'egress'
+    });
 })
 
 const rds = new aws.rds.Instance('turnip-db', {
@@ -64,4 +81,4 @@ const dbUser = user.name;
 const dbPassword = user.password as pulumi.Output<string>;
 const dbName = db.name;
 
-export { dbEndpoint, dbUser, dbPassword, dbName };
+export { dbEndpoint, dbUser, dbPassword, dbName, dbSecurityGroup, dbPort };

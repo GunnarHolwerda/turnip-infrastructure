@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
-import { dbEndpoint, dbName, dbUser, dbPassword } from './components/db';
+import { dbEndpoint, dbName, dbUser, dbPassword, dbSecurityGroup, dbPort } from './components/db';
 import { redisNodes, redisPort, cacheSecurityGroup } from './components/redis';
 
 const config = new pulumi.Config();
@@ -101,6 +101,7 @@ const botService = new awsx.ecs.FargateService('turnip-bot', {
 });
 
 botService.cluster.securityGroups.forEach(sg => {
+    // Create rules for accessing to allow traffic from our service to and from Redis
     new aws.ec2.SecurityGroupRule('service-cache-ingress', {
         securityGroupId: cacheSecurityGroup.id,
         fromPort: redisPort,
@@ -117,7 +118,42 @@ botService.cluster.securityGroups.forEach(sg => {
         type: 'egress',
         sourceSecurityGroupId: sg.id
     });
-})
 
+    // Create rules for accessing to allow traffic from our service to and from RDS
+    new aws.ec2.SecurityGroupRule('service-db-ingress', {
+        securityGroupId: dbSecurityGroup.id,
+        fromPort: dbPort,
+        toPort: dbPort,
+        protocol: 'tcp',
+        type: 'ingress',
+        sourceSecurityGroupId: sg.id
+    })
+    new aws.ec2.SecurityGroupRule('service-db-egress', {
+        securityGroupId: dbSecurityGroup.id,
+        fromPort: dbPort,
+        toPort: dbPort,
+        protocol: 'tcp',
+        type: 'egress',
+        sourceSecurityGroupId: sg.id
+    })
+
+    // Create rules for RDS instance to allow traffic from and to service
+    new aws.ec2.SecurityGroupRule('db-ingress', {
+        securityGroupId: sg.id,
+        fromPort: dbPort,
+        toPort: dbPort,
+        protocol: 'tcp',
+        type: 'egress',
+        sourceSecurityGroupId: dbSecurityGroup.id
+    })
+    new aws.ec2.SecurityGroupRule('db-egress', {
+        securityGroupId: sg.id,
+        fromPort: dbPort,
+        toPort: dbPort,
+        protocol: 'tcp',
+        type: 'egress',
+        sourceSecurityGroupId: dbSecurityGroup.id
+    })
+})
 
 export { dbEndpoint }
