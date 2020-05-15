@@ -4,6 +4,8 @@ config:
   turnip-bot:dbLogging: "false"
   turnip-bot:dbPort: "5432"
   turnip-bot:dbSynchronize: "false"
+  turnip-bot:devIp:
+    secure: AAABAH3r9JN58eWAzPmhW95vVokOlmKnDyHFKN5lqtuySYHqwGssVhYpLA==
   turnip-bot:discordToken:
     secure: AAABALiSA5/aCTDtsaVXlg6oZGvuX5+Aqt12kq0+SHb7oXaSLabXlPldTNXCt9U51Bu3XwlB078dXwS2FKZOmI9sHFrsfLW7P0NHKcTfGzJfcWf+hFnEF0COqw==
   turnip-bot:dockerRegistryToken:
