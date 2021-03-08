@@ -4,7 +4,7 @@
         "deploy:bot": "pulumi up --replace \"urn:pulumi:prod::turnip-bot::awsx:x:ecs:FargateService\\$aws:ecs/service:Service::turnip-bot\""
     },
     "devDependencies": {
-        "@types/node": "^14.10.0"
+        "@types/node": "^14.14.32"
     },
     "dependencies": {
         "@pulumi/aws": "^2.13.1",
